@@ -1,0 +1,74 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Cmd+Option+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Cmd+Shift+K* to preview the HTML file). 
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+
+
+https://usgs-r.github.io/dataRetrieval/
+^ Link to information
+```{r}
+library(dataRetrieval);
+
+vignette("dataRetrieval",package = "dataRetrieval");
+```
+
+Dolores River @ Bedrock Information 
+
+```{r}
+siteNo <- "09171100"
+pCode <- "00060"
+start.date <- "2014-01-01"
+end.date <- "2022-02-14"
+
+doloresBedrock <- readNWISuv(siteNumbers = siteNo,
+                             parameterCd = pCode,
+                             startDate = start.date,
+                             endDate = end.date)
+names(doloresBedrock)
+
+doloresBedrock <- renameNWISColumns(doloresBedrock)
+names(doloresBedrock)
+
+```
+Beginning of Data Exploration
+```{r}
+head(doloresBedrock)
+
+summary(doloresBedrock)
+
+names(attributes(doloresBedrock))
+```
+URL of Attributes 
+```{r}
+url <- attr(doloresBedrock, "url")
+url
+```
+Plot Stream Flow
+```{r}
+library(ggplot2)
+ts <- ggplot(data = doloresBedrock,
+             aes(dateTime, Flow_Inst)) +
+  geom_line()
+ts
+```
+Plot Info with new Labels
+```{r}
+parameterInfo <- attr(doloresBedrock, "variableInfo")
+siteInfo <- attr(doloresBedrock, "siteInfo")
+
+ts <- ts +
+  xlab("Time") +
+  ylab("Discharge, CFS") +
+  ggtitle(siteInfo$station_nm)
+ts
+```
+
+
